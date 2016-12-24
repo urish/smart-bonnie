@@ -1,0 +1,28 @@
+{
+  "name": "smart-bonnie",
+  "version": "1.0.0",
+  "description": "Smart Bonnie (for hirez.io)",
+  "main": "web/bonnie-web.js",
+  "scripts": {
+    "start": "live-server web",
+    "deploy": "gh-pages -d web"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/urish/smart-bonnie.git"
+  },
+  "keywords": [
+    "web",
+    "bluetooth"
+  ],
+  "author": "Uri Shaked",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/urish/smart-bonnie/issues"
+  },
+  "homepage": "https://github.com/urish/smart-bonnie#readme",
+  "devDependencies": {
+    "gh-pages": "0.12.0",
+    "live-server": "1.1.0"
+  }
+}
