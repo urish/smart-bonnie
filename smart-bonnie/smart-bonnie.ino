@@ -3,6 +3,7 @@
 BLEPeripheral      blePeripheral        = BLEPeripheral();
 BLEService         bonnieService        = BLEService("ff09");
 BLECharacteristic  soundCharacteristic  = BLECharacteristic("ff0a", BLEWrite | BLEWriteWithoutResponse, 3);
+BLECharacteristic  commandCharacteristic = BLECharacteristic("ff0b", BLEWrite | BLEWriteWithoutResponse, 3);
 
 void playerCommand(uint8_t cmd, uint8_t arg1, uint8_t arg2) {
   uint8_t data[10] = {0x7e, 0xff, 0x6, cmd, 0, arg1, arg2, 0, 0, 0xef};
@@ -34,6 +35,7 @@ void setup() {
   blePeripheral.setAdvertisedServiceUuid(bonnieService.uuid());
   blePeripheral.addAttribute(bonnieService);
   blePeripheral.addAttribute(soundCharacteristic);
+  blePeripheral.addAttribute(commandCharacteristic);
 
   blePeripheral.begin();
 }
@@ -50,6 +52,10 @@ void loop() {
         uint16_t fileNum = value[0] | (value[1] << 8);
         uint8_t volume = soundCharacteristic.valueLength() >= 3 ? value[2] : 0;
         playSound(fileNum, volume);
+      }
+      if (commandCharacteristic.written() && commandCharacteristic.valueLength() == 3) {
+        const uint8_t* value = commandCharacteristic.value();
+        playerCommand(value[0], value[1], value[2]);
       }
     }
 
