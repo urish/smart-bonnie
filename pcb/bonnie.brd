@@ -149,7 +149,7 @@
 <wire x1="27.40804375" y1="28.448" x2="50.15996875" y2="28.448" width="0" layer="20"/>
 <wire x1="50.15996875" y1="28.448" x2="51.7779" y2="30.15503125" width="0" layer="20" curve="90"/>
 <text x="46.99" y="50.8" size="1.778" layer="26" rot="MR0">Smart Bonnie</text>
-<text x="49.53" y="29.21" size="1.778" layer="26" rot="MR0">BAT</text>
+<text x="48.26" y="40.64" size="1.778" layer="26" rot="MR270">BAT</text>
 <rectangle x1="31.115" y1="52.705" x2="45.72" y2="53.34" layer="41"/>
 <rectangle x1="31.115" y1="51.435" x2="34.29" y2="52.705" layer="41"/>
 <rectangle x1="29.21" y1="51.435" x2="41.275" y2="53.34" layer="42"/>
@@ -157,6 +157,7 @@
 <rectangle x1="35.56" y1="43.815" x2="41.275" y2="51.435" layer="42"/>
 <rectangle x1="34.29" y1="45.72" x2="43.18" y2="52.705" layer="41"/>
 <rectangle x1="34.925" y1="43.815" x2="41.91" y2="46.99" layer="41"/>
+<text x="33.655" y="38.735" size="1.778" layer="26" rot="MR270">SPK</text>
 </plain>
 <libraries>
 <library name="SparkFun-Connectors">
