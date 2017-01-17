@@ -1,5 +1,7 @@
 #include <BLEPeripheral.h>
 
+#define LED_PIN 29
+
 BLEPeripheral      blePeripheral        = BLEPeripheral();
 BLEService         bonnieService        = BLEService("ff09");
 BLECharacteristic  soundCharacteristic  = BLECharacteristic("ff0a", BLEWrite | BLEWriteWithoutResponse, 3);
@@ -26,6 +28,9 @@ void playSound(uint16_t fileNum, uint8_t volume) {
 }
 
 void setup() {
+  pinMode(LED_PIN, OUTPUT);
+  digitalWrite(LED_PIN, LOW);
+  
   Serial.begin(9600);
   Serial.println("Hello, Bonnie!");
 
@@ -41,10 +46,12 @@ void setup() {
 }
 
 void loop() {
+  analogWrite(LED_PIN, millis() % 1000 < 100 ? 250 : 255);
   BLECentral central = blePeripheral.central();
 
   if (central) {
     Serial.println("Game on!");
+    analogWrite(LED_PIN, 240);
 
     while (central.connected()) {
       if (soundCharacteristic.written() && soundCharacteristic.valueLength() >= 2) {
