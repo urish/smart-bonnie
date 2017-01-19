@@ -1,4 +1,6 @@
 #include <BLEPeripheral.h>
+#include "ble.h"
+#include "ble_gap.h"
 
 #define LED_PIN 29
 
@@ -6,6 +8,9 @@ BLEPeripheral      blePeripheral        = BLEPeripheral();
 BLEService         bonnieService        = BLEService("ff09");
 BLECharacteristic  soundCharacteristic  = BLECharacteristic("ff0a", BLEWrite | BLEWriteWithoutResponse, 3);
 BLECharacteristic  commandCharacteristic = BLECharacteristic("ff0b", BLEWrite | BLEWriteWithoutResponse, 3);
+
+#define RSSI_THRESHOLD -50
+#define TARGET_DEVICE_NAME "ng-beacon"
 
 void playerCommand(uint8_t cmd, uint8_t arg1, uint8_t arg2) {
   uint8_t data[10] = {0x7e, 0xff, 0x6, cmd, 0, arg1, arg2, 0, 0, 0xef};
@@ -27,10 +32,36 @@ void playSound(uint16_t fileNum, uint8_t volume) {
   playerCommand(0x3, fileNum);
 }
 
+ble_gap_scan_params_t scanParams = { active: 1, selective: 0, p_whitelist: NULL, interval: 50, window: 50 };
+
+char *getDeviceName(const uint8_t *data, byte dlen) {
+  static char result[16];
+  byte index = 0;
+
+  while (index < dlen + 1) {
+    byte field_len = data[index];
+    byte field_type = data[index + 1];
+    const void *field_data = &data[index + 2];
+    if (field_type == BLE_GAP_AD_TYPE_COMPLETE_LOCAL_NAME) {
+      field_len--;
+      if (field_len > 15) {
+        field_len = 15;
+      }
+      memcpy(result, field_data, field_len);
+      result[field_len] = 0;
+      return result;
+    }
+    index += field_len;
+  }
+
+  return NULL;
+}
+
+
 void setup() {
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, LOW);
-  
+
   Serial.begin(9600);
   Serial.println("Hello, Bonnie!");
 
@@ -43,11 +74,38 @@ void setup() {
   blePeripheral.addAttribute(commandCharacteristic);
 
   blePeripheral.begin();
+
+  scanParams.timeout = 0;
+  sd_ble_gap_scan_start(&scanParams);
 }
+
+unsigned long lastBeacon = 0;
 
 void loop() {
   analogWrite(LED_PIN, millis() % 1000 < 100 ? 250 : 255);
-  BLECentral central = blePeripheral.central();
+
+  uint32_t   evtBuf[512];
+  uint16_t   evtLen = sizeof(evtBuf);
+  ble_evt_t* bleEvt = (ble_evt_t*)evtBuf;
+
+  if (sd_ble_evt_get((uint8_t*)evtBuf, &evtLen) == NRF_SUCCESS) {
+    if (bleEvt->header.evt_id == BLE_GAP_EVT_ADV_REPORT) {
+      const ble_gap_evt_t * p_gap_evt = &bleEvt->evt.gap_evt;
+      const ble_gap_evt_adv_report_t * p_adv_report = &p_gap_evt->params.adv_report;
+      char *deviceName = getDeviceName(p_adv_report->data, p_adv_report->dlen);
+      if (p_adv_report->rssi > RSSI_THRESHOLD && !strcmp(deviceName, TARGET_DEVICE_NAME)) {
+        if (!lastBeacon) {
+          playSound(1, 30);
+        }
+        lastBeacon = millis();
+      }
+    }
+  }
+  if (millis() - lastBeacon > 2000 || millis() < lastBeacon) {
+    lastBeacon = 0;
+  }
+
+  BLECentral central = blePeripheral.central(evtBuf, evtLen);
 
   if (central) {
     Serial.println("Game on!");
