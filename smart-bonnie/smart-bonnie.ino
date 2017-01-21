@@ -38,10 +38,12 @@ char *getDeviceName(const uint8_t *data, byte dlen) {
   static char result[16];
   byte index = 0;
 
-  while (index < dlen + 1) {
+  while (index + 1 < dlen) {
     byte field_len = data[index];
     byte field_type = data[index + 1];
     const void *field_data = &data[index + 2];
+    index += field_len + 1;
+
     if (field_type == BLE_GAP_AD_TYPE_COMPLETE_LOCAL_NAME) {
       field_len--;
       if (field_len > 15) {
@@ -51,12 +53,10 @@ char *getDeviceName(const uint8_t *data, byte dlen) {
       result[field_len] = 0;
       return result;
     }
-    index += field_len;
   }
 
   return NULL;
 }
-
 
 void setup() {
   pinMode(LED_PIN, OUTPUT);
@@ -82,9 +82,7 @@ void setup() {
 unsigned long lastBeacon = 0;
 
 void loop() {
-  analogWrite(LED_PIN, millis() % 1000 < 100 ? 250 : 255);
-
-  uint32_t   evtBuf[512];
+  uint32_t   evtBuf[(sizeof(ble_evt_t) + (GATT_MTU_SIZE_DEFAULT))];
   uint16_t   evtLen = sizeof(evtBuf);
   ble_evt_t* bleEvt = (ble_evt_t*)evtBuf;
 
@@ -95,12 +93,15 @@ void loop() {
       char *deviceName = getDeviceName(p_adv_report->data, p_adv_report->dlen);
       if (p_adv_report->rssi > RSSI_THRESHOLD && !strcmp(deviceName, TARGET_DEVICE_NAME)) {
         if (!lastBeacon) {
-          playSound(1, 30);
+          playSound(5, 30);
         }
         lastBeacon = millis();
       }
     }
+  } else {
+    return;
   }
+
   if (millis() - lastBeacon > 2000 || millis() < lastBeacon) {
     lastBeacon = 0;
   }
@@ -108,22 +109,19 @@ void loop() {
   BLECentral central = blePeripheral.central(evtBuf, evtLen);
 
   if (central) {
-    Serial.println("Game on!");
     analogWrite(LED_PIN, 240);
-
-    while (central.connected()) {
-      if (soundCharacteristic.written() && soundCharacteristic.valueLength() >= 2) {
-        const uint8_t* value = soundCharacteristic.value();
-        uint16_t fileNum = value[0] | (value[1] << 8);
-        uint8_t volume = soundCharacteristic.valueLength() >= 3 ? value[2] : 0;
-        playSound(fileNum, volume);
-      }
-      if (commandCharacteristic.written() && commandCharacteristic.valueLength() == 3) {
-        const uint8_t* value = commandCharacteristic.value();
-        playerCommand(value[0], value[1], value[2]);
-      }
+    if (soundCharacteristic.written() && soundCharacteristic.valueLength() >= 2) {
+      const uint8_t* value = soundCharacteristic.value();
+      uint16_t fileNum = value[0] | (value[1] << 8);
+      uint8_t volume = soundCharacteristic.valueLength() >= 3 ? value[2] : 0;
+      playSound(fileNum, volume);
     }
-
-    Serial.println("Bye bye :-)");
+    if (commandCharacteristic.written() && commandCharacteristic.valueLength() == 3) {
+      const uint8_t* value = commandCharacteristic.value();
+      playerCommand(value[0], value[1], value[2]);
+    }
+  } else {
+    analogWrite(LED_PIN, millis() % 1000 < 100 ? 250 : 255);
   }
 }
+
