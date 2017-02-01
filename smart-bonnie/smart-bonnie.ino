@@ -29,7 +29,7 @@ void playSound(uint16_t fileNum, uint8_t volume) {
     playerCommand(0x6, 0, volume);
     delay(10);
   }
-  playerCommand(0x3, fileNum);
+  playerCommand(0x12, fileNum);
 }
 
 ble_gap_scan_params_t scanParams = { active: 1, selective: 0, p_whitelist: NULL, interval: 50, window: 50 };
@@ -109,7 +109,7 @@ void loop() {
   BLECentral central = blePeripheral.central(evtBuf, evtLen);
 
   if (central) {
-    analogWrite(LED_PIN, 240);
+    analogWrite(LED_PIN, 200);
     if (soundCharacteristic.written() && soundCharacteristic.valueLength() >= 2) {
       const uint8_t* value = soundCharacteristic.value();
       uint16_t fileNum = value[0] | (value[1] << 8);
@@ -121,7 +121,7 @@ void loop() {
       playerCommand(value[0], value[1], value[2]);
     }
   } else {
-    analogWrite(LED_PIN, millis() % 1000 < 100 ? 250 : 255);
+    analogWrite(LED_PIN, millis() % 1000 < 100 ? 200 : 255);
   }
 }
 
