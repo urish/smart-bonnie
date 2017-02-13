@@ -4208,14 +4208,19 @@ bypass capacitor CMOS LDO Regulator</description>
 <instance part="J1" gate="G$1" x="101.6" y="83.82"/>
 <instance part="GND6" gate="1" x="91.44" y="83.82" rot="R270"/>
 <instance part="C1" gate="G$1" x="33.02" y="88.9" rot="R90"/>
-<instance part="GND7" gate="1" x="22.86" y="88.9" rot="R270"/>
+<instance part="GND7" gate="1" x="22.86" y="88.9" smashed="yes" rot="R270">
+<attribute name="VALUE" x="20.32" y="91.44" size="1.778" layer="96" rot="R270"/>
+</instance>
 <instance part="C2" gate="G$1" x="-20.32" y="109.22" rot="R90"/>
 <instance part="GND8" gate="1" x="-27.94" y="109.22" rot="R270"/>
 <instance part="R2" gate="G$1" x="73.66" y="86.36" rot="R180"/>
 <instance part="GND9" gate="1" x="81.28" y="86.36" rot="R90"/>
 <instance part="GND10" gate="1" x="68.58" y="78.74"/>
 <instance part="R3" gate="G$1" x="30.48" y="83.82" rot="R180"/>
-<instance part="D3" gate="G$1" x="22.86" y="83.82" rot="R270"/>
+<instance part="D3" gate="G$1" x="20.32" y="83.82" smashed="yes" rot="R90">
+<attribute name="NAME" x="26.416" y="83.312" size="1.778" layer="95" rot="R180"/>
+<attribute name="VALUE" x="27.94" y="86.233" size="1.778" layer="96" rot="R180"/>
+</instance>
 <instance part="U2" gate="G$1" x="5.08" y="114.3" rot="R180"/>
 <instance part="GND11" gate="1" x="5.08" y="127" rot="R180"/>
 </instances>
@@ -4423,9 +4428,9 @@ bypass capacitor CMOS LDO Regulator</description>
 <pinref part="C1" gate="G$1" pin="2"/>
 </segment>
 <segment>
-<pinref part="D3" gate="G$1" pin="C"/>
-<wire x1="17.78" y1="83.82" x2="10.16" y2="83.82" width="0.1524" layer="91"/>
-<label x="10.16" y="83.82" size="1.778" layer="95"/>
+<pinref part="D3" gate="G$1" pin="A"/>
+<wire x1="17.78" y1="83.82" x2="7.62" y2="83.82" width="0.1524" layer="91"/>
+<label x="7.62" y="83.82" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="VBAT" class="0">
@@ -4458,7 +4463,7 @@ bypass capacitor CMOS LDO Regulator</description>
 <net name="N$5" class="0">
 <segment>
 <pinref part="R3" gate="G$1" pin="2"/>
-<pinref part="D3" gate="G$1" pin="A"/>
+<pinref part="D3" gate="G$1" pin="C"/>
 </segment>
 </net>
 </nets>
