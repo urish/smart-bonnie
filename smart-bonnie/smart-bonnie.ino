@@ -1,8 +1,19 @@
+/**
+   Smart Bonnie Firmware
+   Copyright (C) 2017, Uri Shaked. Published under MIT license.
+
+   This sketch uses the following libraries:
+   - https://github.com/sandeepmistry/arduino-nRF5
+   - https://github.com/sandeepmistry/arduino-BLEPeripheral
+
+   When setting up nRF51, choose the ng-beacon board for the correct pinout
+*/
+
 #include <BLEPeripheral.h>
 #include "ble.h"
 #include "ble_gap.h"
 
-#define LED_PIN 29
+#define LED_PIN 7
 
 BLEPeripheral      blePeripheral        = BLEPeripheral();
 BLEService         bonnieService        = BLEService("ff09");
@@ -80,11 +91,16 @@ void setup() {
 }
 
 unsigned long lastBeacon = 0;
+bool connected = false;
 
 void loop() {
   uint32_t   evtBuf[(sizeof(ble_evt_t) + (GATT_MTU_SIZE_DEFAULT))];
   uint16_t   evtLen = sizeof(evtBuf);
   ble_evt_t* bleEvt = (ble_evt_t*)evtBuf;
+
+  if (!connected) {
+    digitalWrite(LED_PIN, connected || (millis() % 1000 < 100) ? LOW : HIGH);
+  }
 
   if (sd_ble_evt_get((uint8_t*)evtBuf, &evtLen) == NRF_SUCCESS) {
     if (bleEvt->header.evt_id == BLE_GAP_EVT_ADV_REPORT) {
@@ -109,7 +125,7 @@ void loop() {
   BLECentral central = blePeripheral.central(evtBuf, evtLen);
 
   if (central) {
-    analogWrite(LED_PIN, 200);
+    connected = true;
     if (soundCharacteristic.written() && soundCharacteristic.valueLength() >= 2) {
       const uint8_t* value = soundCharacteristic.value();
       uint16_t fileNum = value[0] | (value[1] << 8);
@@ -121,7 +137,7 @@ void loop() {
       playerCommand(value[0], value[1], value[2]);
     }
   } else {
-    analogWrite(LED_PIN, millis() % 1000 < 100 ? 200 : 255);
+    connected = false;
   }
 }
 
