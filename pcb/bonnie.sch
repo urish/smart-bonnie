@@ -4271,7 +4271,6 @@ bypass capacitor CMOS LDO Regulator</description>
 <parts>
 <part name="U$1" library="PTR5518" deviceset="PTR5518" device="STD"/>
 <part name="SWD" library="SparkFun-Connectors" deviceset="M04" device="LOCK"/>
-<part name="GND1" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 <part name="GND2" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 <part name="GND3" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 <part name="GND4" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
@@ -4304,7 +4303,6 @@ bypass capacitor CMOS LDO Regulator</description>
 <instances>
 <instance part="U$1" gate="G$1" x="53.34" y="48.26" rot="MR0"/>
 <instance part="SWD" gate="G$1" x="106.68" y="58.42"/>
-<instance part="GND1" gate="1" x="30.48" y="58.42" rot="R270"/>
 <instance part="GND2" gate="1" x="81.28" y="55.88" rot="R90"/>
 <instance part="GND3" gate="1" x="119.38" y="55.88" rot="R90"/>
 <instance part="GND4" gate="1" x="55.88" y="111.76" rot="R90"/>
@@ -4361,11 +4359,6 @@ bypass capacitor CMOS LDO Regulator</description>
 </segment>
 </net>
 <net name="GND" class="0">
-<segment>
-<pinref part="GND1" gate="1" pin="GND"/>
-<pinref part="U$1" gate="G$1" pin="GND"/>
-<wire x1="33.02" y1="58.42" x2="35.56" y2="58.42" width="0.1524" layer="91"/>
-</segment>
 <segment>
 <pinref part="GND3" gate="1" pin="GND"/>
 <pinref part="SWD" gate="G$1" pin="1"/>
